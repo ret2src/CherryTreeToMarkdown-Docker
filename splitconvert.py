@@ -98,6 +98,7 @@ print("[*] Starting XML to Markdown conversion.")
 convert_ctd_files_to_md(Path(args.output))
 print("[*] XML to Markdown conversion: All done.")
 
+# I'm well aware that the commands below are vulnerable to command injection. But if you're using this quick and dirty piece of hacked script on any production machine with potentially untrusted inputs you're out of your mind anyway ¯\_(ツ)_/¯
 print("[*] Fixing image and file paths ...")
 os.system("find " + str(Path(args.output)) + " -type f -name '*.md' -exec sed -i 's|(./images/|(./_attachments/images/|g' {} +")
 os.system("find " + str(Path(args.output)) + " -type f -name '*.md' -exec sed -i 's|(./files/|(./_attachments/files/|g' {} +")
