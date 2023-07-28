@@ -17,6 +17,12 @@ RUN cd /root \
  && cd /root/cherrytreetomarkdown/ \
  && php composer.phar install
 
+COPY splitconvert.py /root/cherrytreetomarkdown/splitconvert.py
+COPY requirements.txt /root/cherrytreetomarkdown/requirements.txt
+RUN apt install -y python3-pip \
+ && cd /root/cherrytreetomarkdown \
+ && pip install -r requirements.txt --break-system-packages
+
 VOLUME /root/cherrytreetomarkdown/volumes/output
 VOLUME /root/cherrytreetomarkdown/volumes/input
 WORKDIR /root/cherrytreetomarkdown
