@@ -16,12 +16,30 @@ from pathvalidate import sanitize_filepath
 def split_ctd_recursively(current_node, parent_path, indent=0):
     child_nodes = current_node.xpath('node')
 
+    # We have child nodes, i.e. we're a "directory" in Markdown terms.
     if len(child_nodes) > 0:
         try:
             node_name = sanitize_filepath(str(current_node.xpath('@name')[0]))
             parent_path = Path(parent_path, node_name)
         except:
             pass
+
+        # Important special case: A parent node itself has content. We cannot translate this concept directly to Markdown, but we'll create an `index.md` file within the directory.
+        try:
+            # Remove all child nodes, otherwise we'll have duplicate content in `index.md` and all the child node Markdown files.
+            parent_node = current_node
+            for child_node in parent_node.xpath('node'):
+                parent_node.remove(child_node)
+
+            current_file_content = etree.tostring(parent_node).decode()
+            current_filename = os.path.join(parent_path, 'index.ctd')
+            os.makedirs(os.path.dirname(current_filename), exist_ok=True)
+            with open(current_filename, "w") as f:
+                f.write(current_file_content)
+        except:
+            pass
+
+    # We don't have child nodes, i.e. we're a "file" in Markdown terms.
     else:
         current_filename = os.path.join(parent_path, sanitize_filename(str(current_node.xpath('@name')[0])) + '.ctd')
         if args.verbose:
@@ -84,3 +102,8 @@ print("[*] Fixing image and file paths ...")
 os.system("find . -type f -name '*.md' -exec sed -i 's|(./images/|(./_attachments/images/|g' {} +")
 os.system("find . -type f -name '*.md' -exec sed -i 's|(./files/|(./_attachments/files/|g' {} +")
 print("[*] Fixed image and file paths!")
+
+print("[*] Removing empty files and directories ...")
+os.system("find " + str(Path(args.output)) + " -type f -name 'anchor.png' -print -delete")
+os.system("find " + str(Path(args.output)) + " -type d -empty -print -delete -o -type f -empty -print -delete")
+print("[*] Removed empty files and directories!")
