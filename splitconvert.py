@@ -99,8 +99,8 @@ convert_ctd_files_to_md(Path(args.output))
 print("[*] XML to Markdown conversion: All done.")
 
 print("[*] Fixing image and file paths ...")
-os.system("find . -type f -name '*.md' -exec sed -i 's|(./images/|(./_attachments/images/|g' {} +")
-os.system("find . -type f -name '*.md' -exec sed -i 's|(./files/|(./_attachments/files/|g' {} +")
+os.system("find " + str(Path(args.output)) + " -type f -name '*.md' -exec sed -i 's|(./images/|(./_attachments/images/|g' {} +")
+os.system("find " + str(Path(args.output)) + " -type f -name '*.md' -exec sed -i 's|(./files/|(./_attachments/files/|g' {} +")
 print("[*] Fixed image and file paths!")
 
 print("[*] Removing empty files and directories ...")
